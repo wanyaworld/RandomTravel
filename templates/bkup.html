@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Example</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <button id="generateButton">Generate</button> <!-- Generate button -->
+
+    <script>
+        let map;
+        let rectangle;
+        let bounds;
+        let marker; // Variable to keep track of the marker
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: {lat: 37.5665, lng: 126.9780}, // Centered on Seoul
+                zoom: 10
+            });
+
+            // Define bounds for the rectangle surrounding Seoul
+            const seoulBounds = {
+                north: 37.6934,
+                south: 37.4260,
+                east: 127.1824,
+                west: 126.7644
+            };
+
+            bounds = new google.maps.LatLngBounds(
+                { lat: seoulBounds.south, lng: seoulBounds.west },
+                { lat: seoulBounds.north, lng: seoulBounds.east }
+            );
+
+            // Draw the initial rectangle surrounding Seoul
+            rectangle = new google.maps.Rectangle({
+                bounds: bounds,
+                editable: true,
+                draggable: true,
+                map: map
+            });
+
+            // Event listener for when the rectangle is modified
+            google.maps.event.addListener(rectangle, 'bounds_changed', function() {
+                bounds = rectangle.getBounds();
+            });
+
+            // Event listener for when the Generate button is clicked
+            document.getElementById("generateButton").addEventListener("click", function() {
+                if (bounds) {
+                    if (marker) {
+                        marker.setMap(null); // Remove existing marker
+                    }
+                    const randomLat = bounds.getSouthWest().lat() + (Math.random() * (bounds.getNorthEast().lat() - bounds.getSouthWest().lat()));
+                    const randomLng = bounds.getSouthWest().lng() + (Math.random() * (bounds.getNorthEast().lng() - bounds.getSouthWest().lng()));
+                    const randomLatLng = new google.maps.LatLng(randomLat, randomLng);
+                    marker = new google.maps.Marker({
+                        position: randomLatLng,
+                        map: map
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrydy-nCS-jRYEOVsdgNhtQQwc5ItR2Vs&callback=initMap&v=weekly" async defer></script>
+</body>
+</html>
+ 
